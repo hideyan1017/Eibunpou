@@ -3,17 +3,20 @@
 <head>
 <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 電話番号やメールアドレスなどの自動リンク化を防止 -->
+  <meta name="format-detection" content="telephone=no, email=no, address=no">
+  
     <!-- メタタグ・ファビコン -->
   <link rel="icon" href="https://raw.githubusercontent.com/hideyan1017/Eibunpou/refs/heads/main/%E8%8B%B1%E6%96%87%E6%B3%95%E3%82%AF%E3%82%A4%E3%82%BA.png">
   <meta property="og:type" content="article" />
-  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/hideyan1017/Eibunpou/refs/heads/main/%E8%8B%B1%E6%96%87%E6%B3%95%E3%82%AF%E3%82%A4%E3%82%BA.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/hideyan1017/Eibunpou/refs/heads/main/%E8%8B%B1%E6%96%87%E6%96%87%E6%B3%95%E3%82%AF%E3%82%A4%E3%82%BA.png">
 
-  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/hideyan1017/Eibunpou/refs/heads/main/%E8%8B%B1%E6%96%87%E6%B3%95%E3%82%AF%E3%82%A4%E3%82%BA.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="https://raw.githubusercontent.com/hideyan1017/Eibunpou/refs/heads/main/%E8%8B%B1%E6%96%87%E6%B3%95%E3%82%AF%E3%82%A4%E3%82%BA.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/hideyan1017/Eibunpou/refs/heads/main/%E8%8B%B1%E6%96%87%E6%96%87%E3%83%95%E3%82%A4%E3%82%BA.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://raw.githubusercontent.com/hideyan1017/Eibunpou/refs/heads/main/%E8%8B%B1%E6%96%87%E6%96%87%E3%83%95%E3%82%A4%E3%82%BA.png">
 
   <meta property="og:title" content="英文法 Quiz×battle" />
   <meta property="og:description" content="英文法を共に攻略しよう！" />
-  <meta property="og:image" content="https://raw.githubusercontent.com/hideyan1017/Eibunpou/refs/heads/main/%E8%8B%B1%E6%96%87%E6%B3%95%E3%82%AF%E3%82%A4%E3%82%BA%E3%83%90%E3%83%88%E3%83%AB.png" />
+  <meta property="og:image" content="https://raw.githubusercontent.com/hideyan1017/Eibunpou/refs/heads/main/%E8%8B%B1%E6%96%87%E6%96%87%E6%B3%95%E3%82%AF%E3%82%A4%E3%82%BA%E3%83%90%E3%83%88%E3%83%AB.png" />
     <title>英文法クイズ</title>
     <!-- リアルタイム対戦用 PeerJS ライブラリ -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
@@ -35,7 +38,12 @@
             --incorrect-text: #991b1b;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-tap-highlight-color: transparent; /* スマホタップ時の青いハイライトを消す */
+        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Meiryo", sans-serif;
             background-color: var(--bg-color);
@@ -132,6 +140,7 @@
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.15s ease;
+            color: var(--text-main); /* 選択肢の文字色が勝手に青くならないよう固定 */
         }
         .choice-btn:hover:not(:disabled) { background-color: #f8fafc; border-color: #cbd5e1; }
         .choice-btn.correct { background-color: var(--correct-bg) !important; border-color: var(--correct-border) !important; color: var(--correct-text) !important; font-weight: 600; }
@@ -193,22 +202,95 @@
             margin-top: 15px;
         }
 
-        .item-card { border: 1px solid var(--border-color); padding: 14px; border-radius: 6px; margin-bottom: 12px; background: #fff; position: relative; }
-        .item-q { font-weight: 600; margin-bottom: 6px; font-size: 1rem; padding-right: 50px; }
-        .item-a { font-size: 0.88rem; color: var(--text-muted); }
-        .item-delete-btn {
-            position: absolute;
-            top: 14px;
-            right: 14px;
-            font-size: 0.75rem;
-            padding: 4px 10px;
-            border-radius: 4px;
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-            cursor: pointer;
+        /* ライブラリータブ・アコーディオン用スタイル */
+        .library-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid var(--border-color);
         }
-        .item-delete-btn:hover { background: #fecaca; }
+        .tab-btn {
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        details.genre-accordion {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            background: #fff;
+            overflow: hidden;
+        }
+        details.genre-accordion summary {
+            font-weight: 700;
+            background: #f1f5f9;
+            padding: 12px 16px;
+            cursor: pointer;
+            user-select: none;
+            outline: none;
+        }
+        details.genre-accordion summary:hover {
+            background: #e2e8f0;
+        }
+        .accordion-content {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .item-card { 
+            border: 1px solid var(--border-color); 
+            padding: 12px 14px; 
+            border-radius: 6px; 
+            background: #fafaf9; 
+            position: relative; 
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .item-card:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        .item-q { font-weight: 600; margin-bottom: 6px; font-size: 0.95rem; padding-right: 60px; }
+        .item-a { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; }
+        .item-exp { 
+            font-size: 0.85rem; 
+            color: #334155; 
+            background: #f1f5f9; 
+            padding: 8px 10px; 
+            border-radius: 4px; 
+            margin-top: 6px; 
+            border-left: 3px solid var(--primary-color); 
+        }
+        .item-save-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            z-index: 2;
+        }
+        .item-save-btn.saved {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
 
         .screen { display: none; }
         .screen.active { display: block; }
@@ -227,7 +309,7 @@
             <button class="btn" onclick="showScreen('screen-single-setup')">1人で演習を始める</button>
             <button class="btn btn-secondary" onclick="showScreen('screen-battle-menu')">オンライン対戦 (最大8人)</button>
             <button class="btn btn-secondary" id="btn-review-menu" onclick="openWrongQuestionsScreen()" style="display: none;">間違えた問題を見る (<span id="review-count">0</span>問)</button>
-            <button class="btn btn-outline" onclick="openSavedQuestionsScreen()">保存した問題を見る (<span id="saved-count">0</span>問)</button>
+            <button class="btn btn-outline" onclick="openLibraryScreen()">問題ライブラリーを見る / 解く</button>
         </div>
     </div>
 
@@ -288,30 +370,34 @@
             </div>
         </div>
 
-        <!-- ホスト専用：部屋作成後の条件設定 -->
-        <div class="settings-panel" id="host-settings-panel" style="display:none;">
-            <div style="font-weight: 700; margin-bottom: 10px;">出題条件の設定（ホストのみ変更可能）</div>
-            
-            <!-- 制限時間スライダー (15s ~ 60s) -->
-            <div class="form-group">
-                <label for="time-range-input">制限時間: <span id="time-display-val">30</span> 秒</label>
-                <input type="range" id="time-range-input" min="15" max="60" step="5" value="30" style="width: 100%; accent-color: var(--primary-color);" oninput="onHostChangeTimer(this.value)">
+        <div class="settings-panel">
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="input-lobby-player-name">あなたのプレイヤー名：</label>
+                <input type="text" id="input-lobby-player-name" class="input-text" placeholder="名前を入力" maxlength="10" oninput="updateMyPlayerName(this.value)">
             </div>
 
-            <div class="form-group">
-                <label>出題ジャンル：</label>
-                <div class="genre-list" id="battle-genre-list"></div>
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
-                <label for="battle-question-count">出題数：</label>
-                <input type="number" id="battle-question-count" class="input-number" value="10" min="1" max="50">
-            </div>
-        </div>
+            <div id="host-settings-area" style="display:none;">
+                <div style="font-weight: 700; margin-bottom: 10px; margin-top: 15px;">出題条件の設定（ホストのみ変更可能）</div>
+                
+                <div class="form-group">
+                    <label for="time-range-input">制限時間: <span id="time-display-val">30</span> 秒</label>
+                    <input type="range" id="time-range-input" min="15" max="60" step="5" value="30" style="width: 100%; accent-color: var(--primary-color);" oninput="onHostChangeTimer(this.value)">
+                </div>
 
-        <!-- ゲスト用：現在の設定表示 -->
-        <div class="settings-panel" id="guest-settings-panel" style="display:none;">
-            <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">
-                制限時間: <span id="guest-time-val" style="color: var(--text-main);">30</span> 秒（ホストが設定中）
+                <div class="form-group">
+                    <label>出題ジャンル：</label>
+                    <div class="genre-list" id="battle-genre-list"></div>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="battle-question-count">出題数：</label>
+                    <input type="number" id="battle-question-count" class="input-number" value="10" min="1" max="50" onchange="broadcastState()">
+                </div>
+            </div>
+
+            <div id="guest-settings-area" style="display:none; margin-top: 10px;">
+                <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">
+                    制限時間: <span id="guest-time-val" style="color: var(--text-main);">30</span> 秒（ホストが設定中）
+                </div>
             </div>
         </div>
 
@@ -325,7 +411,7 @@
         <div class="btn-group">
             <button class="btn" id="btn-start-battle" style="display: none;" onclick="hostStartBattle()">対戦を開始する</button>
             <button class="btn btn-danger" id="btn-close-room" style="display: none;" onclick="hostCloseRoom()">部屋を解散する</button>
-            <button class="btn btn-secondary" id="btn-leave-room" onclick="leaveRoomAndHome()">キャンセルして戻る</button>
+            <button class="btn btn-secondary" id="btn-leave-room" onclick="leaveRoomAndHome()">部屋を退出してメイン画面に戻る</button>
         </div>
     </div>
 
@@ -362,7 +448,7 @@
         </div>
     </div>
 
-    <!-- 6. 間違えた問題一覧画面 -->
+    <!-- 6. 間違えた問題一覧画面（解説付き） -->
     <div id="screen-wrong-questions" class="screen">
         <h2>間違えた問題一覧</h2>
         <div class="btn-group" style="margin-bottom: 15px;">
@@ -375,11 +461,19 @@
         </div>
     </div>
 
-    <!-- 7. 保存した問題一覧画面 -->
-    <div id="screen-saved-questions" class="screen">
-        <h2>保存した問題一覧（ジャンル別）</h2>
-        <div id="saved-questions-container"></div>
-        <div class="btn-group">
+    <!-- 7. 問題ライブラリー画面（解説付き） -->
+    <div id="screen-library" class="screen">
+        <h2>問題ライブラリー</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">ジャンルを選択して展開し、問題をクリックするとその場で解くことができます。</p>
+
+        <div class="library-tabs">
+            <button class="tab-btn active" id="tab-all-questions" onclick="switchLibraryTab('all')">全問題ライブラリー</button>
+            <button class="tab-btn" id="tab-saved-questions" onclick="switchLibraryTab('saved')">マイ保存問題 (<span id="my-saved-count">0</span>)</button>
+        </div>
+
+        <div id="library-questions-container"></div>
+
+        <div class="btn-group" style="margin-top: 20px;">
             <button class="btn btn-secondary" onclick="showScreen('screen-main')">メイン画面に戻る</button>
         </div>
     </div>
@@ -393,8 +487,11 @@
 
         <div class="btn-group">
             <button class="btn" id="multi-restart-btn" onclick="backToLobbySettings()" style="display:none;">設定を変更してもう一度遊ぶ</button>
+            
             <p id="guest-restart-msg" style="color:var(--text-muted); font-size:0.85rem; text-align:center; display:none;">ホストの設定をお待ちください...</p>
-            <button class="btn btn-secondary" onclick="leaveRoomAndHome()">メイン画面に戻る</button>
+            <button class="btn btn-secondary" id="guest-back-lobby-btn" style="display:none;" onclick="backToLobbySettingsFromGuest()">待機ルームに戻る</button>
+
+            <button class="btn btn-secondary" onclick="leaveRoomAndHome()">部屋を退出してメイン画面に戻る</button>
         </div>
     </div>
 
@@ -405,7 +502,7 @@
     //  問題データベース
     // ==========================================
     const questionDatabase = [
-{
+        {
         id: "q1",
         genre: "時制",
         question: "Water () at 100 degrees Celsius under normal atmospheric pressure.",
@@ -1205,7 +1302,7 @@
         answerIndex: 0,
         explanation: "「handle with care（慎重に扱う）」を受動態にした形で、「be handled with care」となります。"
     },
-    {
+{
     id: "q101",
     genre: "助動詞",
     question: "You () have consulted a doctor as soon as you felt the pain.",
@@ -2405,7 +2502,7 @@
     answerIndex: 0,
     explanation: "「hope to do」で「〜になることを望む・希望する」という意味を表します。"
 },
-{
+        {
             id: "q251",
             genre: "動名詞",
             question: "He enjoys () English novels in his free time.",
@@ -3605,7 +3702,7 @@
         answerIndex: 2,
         explanation: "by far は最上級（best）を強調する際に用いられる定番の表現です。"
     },
-    {
+	{
         id: "q401",
         genre: "代名詞",
         question: "This book is mine, and that one is ().",
@@ -4405,7 +4502,7 @@
         answerIndex: 1,
         explanation: "前文の内容を受ける継続用法（非制限用法）の関係代名詞 which です。"
     },
-    {
+	{
         id: "q501",
         genre: "接続詞",
         question: "Hurry up, () you will miss the train.",
@@ -6807,16 +6904,15 @@
     }
     ];
 
-    // ゲーム基本状態
-    let mode = 'single'; // 'single' or 'multi'
+    let mode = 'single'; 
     let isReviewMode = false;
     let currentQuestions = [];
     let currentIndex = 0;
     let currentScore = 0;
     let timerInterval = null;
-    let battleTimeLimit = 30; // デフォルト30秒
+    let battleTimeLimit = 30;
+    let currentLibraryTab = 'all';
 
-    // PeerJS オンライン対戦用状態 (最大8人)
     const MAX_PLAYERS = 8;
     let peer = null;
     let hostConnMap = new Map();
@@ -6855,12 +6951,13 @@
         const genres = [...new Set(questionDatabase.map(q => q.genre))];
         ['single-genre-list', 'battle-genre-list'].forEach(listId => {
             const container = document.getElementById(listId);
+            if (!container) return;
             container.innerHTML = "";
             genres.forEach(genre => {
                 const count = questionDatabase.filter(q => q.genre === genre).length;
                 const label = document.createElement("label");
                 label.className = "genre-item";
-                label.innerHTML = `<input type="checkbox" value="${genre}" checked> ${genre} (${count}問)`;
+                label.innerHTML = `<input type="checkbox" value="${genre}" checked onchange="broadcastState()"> ${genre} (${count}問)`;
                 container.appendChild(label);
             });
         });
@@ -6868,8 +6965,10 @@
 
     function updateReviewButton() {
         const wrongIds = JSON.parse(localStorage.getItem('grammar_wrong_questions') || "[]");
-        document.getElementById('review-count').innerText = wrongIds.length;
-        document.getElementById('btn-review-menu').style.display = wrongIds.length > 0 ? "block" : "none";
+        const reviewCountEl = document.getElementById('review-count');
+        const btnReviewMenu = document.getElementById('btn-review-menu');
+        if (reviewCountEl) reviewCountEl.innerText = wrongIds.length;
+        if (btnReviewMenu) btnReviewMenu.style.display = wrongIds.length > 0 ? "block" : "none";
     }
 
     function saveWrongQuestion(qId) {
@@ -6901,21 +7000,17 @@
                 const item = document.createElement('div');
                 item.className = 'item-card';
                 item.innerHTML = `
-                    <button class="item-delete-btn" onclick="removeSingleWrongQuestion('${q.id}')">削除</button>
                     <div style="font-size:0.8rem; font-weight:700; color:var(--text-muted); margin-bottom:4px;">[${q.genre}]</div>
                     <div class="item-q">${formatQuestionText(q.question)}</div>
                     <div class="item-a"><strong>正解:</strong> ${q.choices[q.answerIndex]}</div>
-                    <div class="item-a" style="margin-top: 4px;"><strong>解説:</strong> ${q.explanation}</div>
+                    <div class="item-exp"><strong>解説:</strong> ${q.explanation}</div>
+                    <div class="item-a" style="margin-top: 8px; color: var(--accent-blue);">クリックしてこの問題を解く ➔</div>
                 `;
+                item.onclick = () => startSingleCustomQuiz([q]);
                 container.appendChild(item);
             });
         }
         showScreen('screen-wrong-questions');
-    }
-
-    function removeSingleWrongQuestion(qId) {
-        removeWrongQuestion(qId);
-        openWrongQuestionsScreen();
     }
 
     function clearAllWrongQuestions() {
@@ -6932,24 +7027,27 @@
 
     function updateSavedButtonUI() {
         const savedIds = getSavedQuestions();
-        document.getElementById('saved-count').innerText = savedIds.length;
+        const mySavedCount = document.getElementById('my-saved-count');
+        if (mySavedCount) mySavedCount.innerText = savedIds.length;
+
         if (currentQuestions.length > 0 && currentQuestions[currentIndex]) {
             const qId = currentQuestions[currentIndex].id;
             const btn = document.getElementById('btn-save-current');
-            if (savedIds.includes(qId)) {
-                btn.innerText = "保存済み";
-                btn.style.backgroundColor = "var(--primary-color)";
-                btn.style.color = "#fff";
-            } else {
-                btn.innerText = "この問題を保存";
-                btn.style.backgroundColor = "transparent";
-                btn.style.color = "var(--text-main)";
+            if (btn) {
+                if (savedIds.includes(qId)) {
+                    btn.innerText = "保存済み";
+                    btn.style.backgroundColor = "var(--primary-color)";
+                    btn.style.color = "#fff";
+                } else {
+                    btn.innerText = "この問題を保存";
+                    btn.style.backgroundColor = "transparent";
+                    btn.style.color = "var(--text-main)";
+                }
             }
         }
     }
 
-    function toggleSaveCurrentQuestion() {
-        const qId = currentQuestions[currentIndex].id;
+    function toggleSaveQuestionId(qId) {
         let savedIds = getSavedQuestions();
         if (savedIds.includes(qId)) {
             savedIds = savedIds.filter(id => id !== qId);
@@ -6958,53 +7056,81 @@
         }
         localStorage.setItem('grammar_saved_questions', JSON.stringify(savedIds));
         updateSavedButtonUI();
+        renderLibraryQuestions();
     }
 
-    function removeSavedQuestion(qId) {
-        let savedIds = getSavedQuestions();
-        savedIds = savedIds.filter(id => id !== qId);
-        localStorage.setItem('grammar_saved_questions', JSON.stringify(savedIds));
+    function toggleSaveCurrentQuestion() {
+        if (currentQuestions.length > 0 && currentQuestions[currentIndex]) {
+            toggleSaveQuestionId(currentQuestions[currentIndex].id);
+        }
+    }
+
+    function openLibraryScreen() {
         updateSavedButtonUI();
-        openSavedQuestionsScreen();
+        renderLibraryQuestions();
+        showScreen('screen-library');
     }
 
-    function openSavedQuestionsScreen() {
-        const savedIds = getSavedQuestions();
-        const savedQuestions = questionDatabase.filter(q => savedIds.includes(q.id));
-        const container = document.getElementById('saved-questions-container');
+    function switchLibraryTab(tab) {
+        currentLibraryTab = tab;
+        document.getElementById('tab-all-questions').classList.toggle('active', tab === 'all');
+        document.getElementById('tab-saved-questions').classList.toggle('active', tab === 'saved');
+        renderLibraryQuestions();
+    }
+
+    function renderLibraryQuestions() {
+        const container = document.getElementById('library-questions-container');
+        if (!container) return;
         container.innerHTML = "";
 
-        if (savedQuestions.length === 0) {
-            container.innerHTML = "<p style='text-align:center;'>保存された問題はありません。</p>";
-        } else {
-            const genres = [...new Set(savedQuestions.map(q => q.genre))];
-            genres.forEach(genre => {
-                const genreBlock = document.createElement('div');
-                genreBlock.className = 'genre-block';
-                genreBlock.innerHTML = `<div style="font-weight:700; background:#f1f5f9; padding:6px 12px; border-radius:4px; margin-bottom:10px;">${genre}</div>`;
+        const savedIds = getSavedQuestions();
+        let targetQuestions = questionDatabase;
 
-                const genreQuestions = savedQuestions.filter(q => q.genre === genre);
-                genreQuestions.forEach(q => {
-                    const item = document.createElement('div');
-                    item.className = 'item-card';
-                    item.innerHTML = `
-                        <button class="item-delete-btn" onclick="removeSavedQuestion('${q.id}')">削除</button>
-                        <div class="item-q">${formatQuestionText(q.question)}</div>
-                        <div class="item-a"><strong>正解:</strong> ${q.choices[q.answerIndex]}</div>
-                        <div class="item-a" style="margin-top: 4px;"><strong>解説:</strong> ${q.explanation}</div>
-                    `;
-                    genreBlock.appendChild(item);
-                });
-                container.appendChild(genreBlock);
-            });
+        if (currentLibraryTab === 'saved') {
+            targetQuestions = questionDatabase.filter(q => savedIds.includes(q.id));
         }
-        updateSavedButtonUI();
-        showScreen('screen-saved-questions');
+
+        if (targetQuestions.length === 0) {
+            container.innerHTML = `<p style="text-align:center; color:var(--text-muted); margin-top:20px;">${currentLibraryTab === 'saved' ? '保存された問題はありません。' : '問題がありません。'}</p>`;
+            return;
+        }
+
+        const genres = [...new Set(targetQuestions.map(q => q.genre))];
+        genres.forEach(genre => {
+            const genreQuestions = targetQuestions.filter(q => q.genre === genre);
+            
+            const details = document.createElement('details');
+            details.className = 'genre-accordion';
+
+            const summary = document.createElement('summary');
+            summary.innerHTML = `${genre} <span style="font-weight:normal; font-size:0.85rem; color:var(--text-muted);">(${genreQuestions.length}問)</span>`;
+            details.appendChild(summary);
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'accordion-content';
+
+            genreQuestions.forEach(q => {
+                const isSaved = savedIds.includes(q.id);
+                const item = document.createElement('div');
+                item.className = 'item-card';
+                item.innerHTML = `
+                    <button class="item-save-btn ${isSaved ? 'saved' : ''}" onclick="event.stopPropagation(); toggleSaveQuestionId('${q.id}')">
+                        ${isSaved ? '保存済み' : '保存'}
+                    </button>
+                    <div class="item-q">${formatQuestionText(q.question)}</div>
+                    <div class="item-a"><strong>正解:</strong> ${q.choices[q.answerIndex]}</div>
+                    <div class="item-exp"><strong>解説:</strong> ${q.explanation}</div>
+                    <div class="item-a" style="margin-top: 8px; color: var(--accent-blue);">クリックしてこの問題を解く ➔</div>
+                `;
+                item.onclick = () => startSingleCustomQuiz([q]);
+                contentDiv.appendChild(item);
+            });
+
+            details.appendChild(contentDiv);
+            container.appendChild(details);
+        });
     }
 
-    // ==========================================
-    //  1人演習
-    // ==========================================
     function startSingleQuiz() {
         const checkboxes = document.querySelectorAll("#single-genre-list input:checked");
         const selectedGenres = Array.from(checkboxes).map(cb => cb.value);
@@ -7014,15 +7140,7 @@
         let pool = questionDatabase.filter(q => selectedGenres.includes(q.genre));
         currentQuestions = shuffleArray(pool).slice(0, maxCount);
 
-        mode = 'single';
-        isReviewMode = false;
-        currentIndex = 0;
-        currentScore = 0;
-
-        document.getElementById('battle-score-board').style.display = "none";
-        document.getElementById('quiz-timer').style.display = "none";
-        showScreen('screen-quiz');
-        loadQuestion();
+        startSingleCustomQuiz(currentQuestions, false);
     }
 
     function startReviewMode() {
@@ -7030,20 +7148,25 @@
         if (wrongIds.length === 0) return alert("間違えた問題はありません。");
 
         currentQuestions = questionDatabase.filter(q => wrongIds.includes(q.id));
+        startSingleCustomQuiz(currentQuestions, true);
+    }
+
+    function startSingleCustomQuiz(questions, isReview = false) {
+        currentQuestions = questions;
         mode = 'single';
-        isReviewMode = true;
+        isReviewMode = isReview;
         currentIndex = 0;
         currentScore = 0;
 
-        document.getElementById('battle-score-board').style.display = "none";
-        document.getElementById('quiz-timer').style.display = "none";
+        const battleScoreBoard = document.getElementById('battle-score-board');
+        const quizTimer = document.getElementById('quiz-timer');
+        if (battleScoreBoard) battleScoreBoard.style.display = "none";
+        if (quizTimer) quizTimer.style.display = "none";
+        
         showScreen('screen-quiz');
         loadQuestion();
     }
 
-    // ==========================================
-    //  PeerJS 通信・対戦ロジック (最大8人)
-    // ==========================================
     function broadcast(data) {
         if (isHost) {
             hostConnMap.forEach(conn => {
@@ -7074,8 +7197,9 @@
             playersList = [{ id: myPeerId, name: myName, score: 0, finishedQ: false }];
 
             document.getElementById('display-room-id').innerText = roomId;
-            document.getElementById('host-settings-panel').style.display = "block";
-            document.getElementById('guest-settings-panel').style.display = "none";
+            document.getElementById('input-lobby-player-name').value = myName;
+            document.getElementById('host-settings-area').style.display = "block";
+            document.getElementById('guest-settings-area').style.display = "none";
             document.getElementById('btn-start-battle').style.display = "inline-flex";
             document.getElementById('btn-close-room').style.display = "inline-flex";
             document.getElementById('guest-wait-msg').style.display = "none";
@@ -7141,8 +7265,9 @@
             guestConn.on('open', () => {
                 guestConn.send({ type: 'JOIN', name: myName, peerId: myPeerId });
                 document.getElementById('display-room-id').innerText = roomId;
-                document.getElementById('host-settings-panel').style.display = "none";
-                document.getElementById('guest-settings-panel').style.display = "block";
+                document.getElementById('input-lobby-player-name').value = myName;
+                document.getElementById('host-settings-area').style.display = "none";
+                document.getElementById('guest-settings-area').style.display = "block";
                 document.getElementById('btn-start-battle').style.display = "none";
                 document.getElementById('btn-close-room').style.display = "none";
                 document.getElementById('guest-wait-msg').style.display = "block";
@@ -7155,6 +7280,19 @@
         peer.on('error', (err) => {
             alert('ルームへの接続に失敗しました。IDをご確認ください。');
         });
+    }
+
+    function updateMyPlayerName(newName) {
+        myName = newName.trim() || "プレイヤー";
+        const me = playersList.find(p => p.id === myPeerId);
+        if (me) {
+            me.name = myName;
+            if (isHost) {
+                broadcastState();
+            } else if (guestConn && guestConn.open) {
+                guestConn.send({ type: 'UPDATE_NAME', peerId: myPeerId, name: myName });
+            }
+        }
     }
 
     function onHostChangeTimer(val) {
@@ -7176,6 +7314,12 @@
                     playersList.push({ id: data.peerId, name: data.name, score: 0, finishedQ: false });
                 }
                 broadcastState();
+            } else if (data.type === 'UPDATE_NAME' && isHost) {
+                const p = playersList.find(item => item.id === data.peerId);
+                if (p) {
+                    p.name = data.name;
+                    broadcastState();
+                }
             } else if (data.type === 'STATE_UPDATE') {
                 playersList = data.playersList;
                 battleTimeLimit = data.timeLimit;
@@ -7235,7 +7379,6 @@
             hostConnMap.delete(peerId);
             broadcastState();
 
-            // ホスト1人になった場合（自分以外の参加者が0人）の処理
             if (playersList.length <= 1) {
                 alert('参加者が全員いなくなったため、部屋を解散します。');
                 leaveRoomAndHome();
@@ -7261,6 +7404,7 @@
 
     function renderLobbyPlayerList() {
         const listEl = document.getElementById('player-list-ui');
+        if (!listEl) return;
         listEl.innerHTML = '';
         playersList.forEach(p => {
             const isMe = p.id === myPeerId;
@@ -7356,9 +7500,11 @@
         showScreen('screen-battle-lobby');
     }
 
-    // ==========================================
-    //  クイズ進行ロジック
-    // ==========================================
+    function backToLobbySettingsFromGuest() {
+        isGameStarted = false;
+        showScreen('screen-battle-lobby');
+    }
+
     function loadQuestion() {
         clearTimers();
         const q = currentQuestions[currentIndex];
@@ -7405,6 +7551,7 @@
 
     function updateScoreBoard() {
         const sb = document.getElementById('battle-score-board');
+        if (!sb) return;
         sb.innerHTML = '';
         const myP = playersList.find(p => p.id === myPeerId);
         if (myP) myP.score = currentScore;
@@ -7514,11 +7661,13 @@
         const detailEl = document.getElementById('result-detail');
         const multiRestartBtn = document.getElementById('multi-restart-btn');
         const guestRestartMsg = document.getElementById('guest-restart-msg');
+        const guestBackLobbyBtn = document.getElementById('guest-back-lobby-btn');
 
         if (mode === 'single') {
             multiRestartBtn.style.display = "none";
             guestRestartMsg.style.display = "none";
-            detailEl.innerHTML = `<p>演習お疲れ様でした。間違えた問題や気になる問題は保存・復習から確認できます。</p>`;
+            guestBackLobbyBtn.style.display = "none";
+            detailEl.innerHTML = `<p>演習お疲れ様でした。</p>`;
         } else {
             const sorted = [...playersList].sort((a, b) => b.score - a.score);
             let resultText = "";
@@ -7544,13 +7693,14 @@
             if (isHost) {
                 multiRestartBtn.style.display = "inline-flex";
                 guestRestartMsg.style.display = "none";
+                guestBackLobbyBtn.style.display = "none";
             } else {
                 multiRestartBtn.style.display = "none";
                 guestRestartMsg.style.display = "block";
+                guestBackLobbyBtn.style.display = "inline-flex";
             }
         }
         updateReviewButton();
-        updateSavedButtonUI();
     }
 
     window.onload = () => {
